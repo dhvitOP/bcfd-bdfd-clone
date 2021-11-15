@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<%- include("./head.ejs"); %>
+<body class="overlay-scrollbar">
+	<!-- navbar -->
+
+	<!-- end navbar -->
+	<!-- sidebar -->
+
+	<!-- end sidebar -->
+	<!-- main content -->
+ <div class="commands-bg">
+	 <div class="wrapper">
+		<div class="row">
+			<div class="col-12 col-m-12 col-sm-12">
+				<div class="card">
+					<div class="card-header">
+						<h3>
+							Events
+						</h3>
+            <style>
+    a { color: 	#FFFFFF; } /* CSS link color */
+  </style>
+					
+					</div>
+					<div class="card-content">
+						<table>
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Name</th>
+									<th>Description</th>
+									<th>Status</th>
+									<th>Config</th>
+                                    
+								</tr>
+							</thead>
+            
+							<tbody>
+              <% for(let i = 0; i < botdata.events.length; i++) { 
+              %>
+               <% let count = i+1 %>
+              <% let xd = botdata.events[i]; %>
+              
+								<tr>
+									<td><%- count %></td>
+									<td><%- xd %></td>
+									<td>This Event will be emitted when the Your event's action will be triggered automatically</td>
+									<td>
+										<span class="dot">
+											<i class="bg-success"></i>
+											Working
+										</span>
+									</td>
+										<td>	
+                  
+							<a href="https://bcfd.dhvitop.repl.co/bot/<%- bot.user.id %>/event/<%- xd %>"  class="fas fa-edit"></a><a href=" https://bcfd.dhvitop.repl.co/bot/<%- bot.user.id %>/event/<%- xd %>/delete" class="fas fa-trash-alt" >
+							
+							</a>
+								
+						
+           
+						</td>
+                <% } %>
+								
+                
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+    </div>
+	</div>	
+	<!-- end main content -->
+	<!-- import script -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<!-- end import script -->
+</body>
+</html>

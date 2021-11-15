@@ -1,0 +1,37 @@
+<body>
+<div class="content">
+<link rel="stylesheet" type="text/css" href="https://bcfd.dhvitop.repl.co/css/dashboard.css">
+<link rel="stylesheet" type="text/css" href="https://bcfd.dhvitop.repl.co/css/style.css">
+
+
+<h2>Select A Bot</h2>
+<p class="note"><span class="bold">;)</span> You need to be<code>OWNER</code> of the bot so you can manage it.</p>
+
+
+ <div class="support-server-container">
+  <h3 class="support-server-header">Hey <%= req.user.username%>!</h3>
+  <p class="support-server-text">Join the Official Star Studios server if you haven't already! <a href="https://discord.gg/nXX7jdM3tA">Join Now!</a></p>
+ </div>
+
+  
+<div class="bots">
+<% botsdata.filter(a => a.ownerid === req.user.id).map(botdata => {
+let bot = allbots.get(botdata.botID)
+let icon = bot.user.displayAvatarURL();
+%>
+
+<% if (!botdata) { %>
+ <h3><span class="bold">:(</span> There are no bots.</h3><br>
+ <p class="note"><span class="bold">Info:</span> To create a bot, go in create bot page.</p>
+<% } else { %>
+ <div class="server" >
+ <div class="icon-and-name">
+ <img class="server-icon" src="<%- icon %>" alt="<% bot.user.username %>"/>
+ <p class="guild-name" > <a onclick="https://bcfd.dhvitop.repl.co/bot/<%- bot.user.id %> "><%= bot.user.username %></a></p>
+ </div>
+
+ </div>
+ <% } %>
+<% }); %>
+</div>
+</body>

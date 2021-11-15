@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<%- include("./head.ejs"); %>
+<% let lservers = db.fetch(`${botdata.stoken}_leftguilds_${bot.user.id}`) %>
+<% let jservers = db.fetch(`${botdata.stoken}_joinedguilds_${bot.user.id}`) %>
+<body class="overlay-scrollbar">
+	<!-- navbar -->
+
+	<!-- end navbar -->
+	<!-- sidebar -->
+
+	<!-- end sidebar -->
+	<!-- main content -->
+	<div class="wrapper">
+		<div class="row">
+			<div class="col-3 col-m-6 col-sm-6">
+				<div class="counter bg-primary">
+					<p>
+						<i class="fas fa-tasks"></i>
+					</p>
+					<h3><%- bot.guilds.cache.size %></h3>
+					<p>Servers</p>
+				</div>
+			</div>
+			<div class="col-3 col-m-6 col-sm-6">
+				<div class="counter bg-warning">
+					<p>
+						<i class="fas fa-align-justify"></i>
+					</p>
+					<h3><%- hostingtime %></h3>
+					<p>Online Time/uptime</p>
+				</div>
+			</div>
+      
+			<div class="col-3 col-m-6 col-sm-6">
+				<div class="counter bg-success">
+					<p>
+						<i class="fas fa-check-circle"></i>
+					</p>
+					<h3><%- jservers %></h3>
+					<p>Servers Joined Today</p>
+				</div>
+			</div>
+			<div class="col-3 col-m-6 col-sm-6">
+				<div class="counter bg-danger">
+					<p>
+						<i class="fas fa-bug"></i>
+					</p>
+					<h3><%- lservers %></h3>
+					<p>Servers Left Today</p>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-8 col-m-12 col-sm-12">
+				<div class="card">
+					<div class="card-header">
+						<h3>
+							Servers (<%- bot.guilds.cache.size %>)
+						</h3>
+					
+					</div>
+					<div class="card-content">
+						<table>
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Server Name</th>
+									<th>Server ID</th>
+									<th>Members (Excluding Bots)</th>
+									<th>Owner</th>
+								</tr>
+							</thead>
+							<tbody>
+              <% bot.guilds.cache.forEach((guildxd) => { %>
+              
+								<tr>
+                  <% let guild = bot.guilds.cache.get(guildxd.id); %>
+									<td>Server</td>
+									<td><%- guild.name %></td>
+									<td><%-  guild.id%></td>
+									<td>
+
+                  <%- guild.members.cache.filter(m => !m.user.bot).size %>
+									</td>
+              
+									<td><%- guild.ownerId %></td>
+								</tr>
+								<% }) %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		
+
+	<!-- end main content -->
+	<!-- import script -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<!-- end import script -->
+</body>
+</html>

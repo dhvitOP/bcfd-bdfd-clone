@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<%- include("./head.ejs"); %>
+<body class="overlay-scrollbar">
+	<!-- navbar -->
+
+	<!-- end sidebar -->
+	<!-- main content -->
+ <div class="commands-bg">
+	 <div class="wrapper">
+		<div class="row">
+			<div class="col-12 col-m-12 col-sm-12">
+				<div class="card">
+					<div class="card-header">
+						<h3>
+							Settings
+						</h3>
+			
+					</div>
+					<div class="card-content">
+						<form class="card-form"method="POST">
+							<h4>Bot Name</h4>
+						<input maxlength="50" type="text" name="botname"  value="<%- bot.user.username %>" class="card-input">
+					
+						<h4>Bot Status</h4>
+						<input maxlength="50" type="text" name="botstatus"  value="<%- status %>" class="card-input">
+                        <h4>Bot Prefix</h4>
+                        
+                        <input maxlength="50" name="botprefix" type="text" value="<%- prefix %>" class="card-input">
+                           <button type="submit" name="btnSubmit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+						</form>
+					</div>
+				</div>
+			</div>
+    </div>
+	</div>	
+	<!-- end main content -->
+	<!-- import script -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<!-- end import script -->
+</body>
+</html>

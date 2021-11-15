@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<%- include("./head.ejs"); %>
+<body class="overlay-scrollbar">
+	<!-- navbar -->
+	
+	<!-- end sidebar -->
+	<!-- main content -->
+ <div class="commands-bg">
+	 <div class="wrapper">
+		<div class="row">
+			<div class="col-12 col-m-12 col-sm-12">
+				<div class="card">
+					<div class="card-header">
+						<h3>
+							Create Event
+						</h3>
+		
+					</div>
+					<div class="card-content">
+          <% if(type === "edit") { %>
+          	<form class="card-form" method= "POST">
+							<h4>Event Name</h4>
+						<input maxlength="50" name="evname" id="evname" type="text" value="<%- evname%>" placeholder="Event Name" class="card-input">
+						
+						<h4>Event Code</h4>
+						<textarea name="evdata" id="evdata" cols="0" rows="22" placeholder="Event Code" type="text" class="card-input"><%- evdata %></textarea>
+            <button type="submit" name="btnSubmit" value="<%- evdata %>" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+						</form>
+            <% } else { %>
+						<form class="card-form" method= "POST">
+							<h4>Event Name</h4>
+						<input maxlength="50" name="evname" id="evname" type="text" placeholder="Event Name" class="card-input">
+						
+						<h4>Event Code</h4>
+						<textarea name="evdata" id="evdata" cols="0" rows="22" placeholder="Event Code" type="text" class="card-input"></textarea>
+            <button type="submit" name="btnSubmit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+						</form>
+            <% } %>
+					</div>
+				</div>
+			</div>
+    </div>
+	</div>	
+	<!-- end main content -->
+	<!-- import script -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<!-- end import script -->
+</body>
+</html>

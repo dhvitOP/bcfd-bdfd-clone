@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<%- include("./head.ejs"); %>
+<body class="overlay-scrollbar">
+
+	<!-- end sidebar -->
+	<!-- main content -->
+ <div class="commands-bg">
+	 <div class="wrapper">
+		<div class="row">
+			<div class="col-12 col-m-12 col-sm-12">
+				<div class="card">
+					<div class="card-header">
+						<h3>
+						Create/Edit Command
+						</h3>
+               <style>
+    button { color: 	#FFFFFF;} /* CSS link color */
+  </style>
+				
+					</div>
+             <% if(type === "edit") { %>
+					<div class="card-content">
+       
+          <form class="card-form" method="POST">
+							<h4>Command Name</h4>
+              
+						<input name="cmdname" maxlength="50" value="<%- cmdname %>" type="text" placeholder="Command Name" id="cmdname" class="card-input">
+						<h4>Command Description</h4>
+						<input name="cmddes" maxlength="50" value="<%- cmddes %>" type="text" placeholder="Command Description" id="cmddes" class="card-input">
+						<h4>Command Code</h4>
+						<textarea name="cmddata" id="cmddata" cols="0" rows="22" placeholder="Command Code" type="text" class="card-input"><%- cmddata %></textarea>
+
+           <button type="submit" name="btnSubmit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+						</form>
+            </div>
+            <% } else { %>
+            	<div class="card-content">
+						<form class="card-form" method="POST">
+							<h4>Command Name</h4>
+              
+						<input name="cmdname" maxlength="50" type="text" placeholder="Command Name" id="cmdname" class="card-input">
+						<h4>Command Description</h4>
+						<input name="cmddes" maxlength="50" type="text" placeholder="Command Description" id="cmddes" class="card-input">
+						<h4>Command Code</h4>
+						<textarea name="cmddata" id="cmddata" cols="0" rows="22" placeholder="Command Code" type="text" class="card-input"></textarea>
+           <button type="submit" name="btnSubmit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+						</form>
+            </div>
+            <% } %>
+	
+				</div>
+			</div>
+    </div>
+	</div>	
+  </div>
+	<!-- end main content -->
+	<!-- import script -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<!-- end import script -->
+</body>
+</html>

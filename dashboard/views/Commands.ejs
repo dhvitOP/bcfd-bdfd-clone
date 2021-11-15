@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<%- include("./head.ejs"); %>
+<body class="overlay-scrollbar">
+
+	<!-- end sidebar -->
+	<!-- main content -->
+ <div class="commands-bg">
+	 <div class="wrapper">
+		<div class="row">
+			<div class="col-12 col-m-12 col-sm-12">
+				<div class="card">
+					<div class="card-header">
+						<h3>
+							Commands
+						</h3>
+						
+					</div>
+					<div class="card-content">
+						<table>
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Name</th>
+									<th>Description</th>
+									<th>Status</th>
+									<th>Config</th>
+                                    
+								</tr>
+							</thead>
+            
+							<tbody>
+               <style>
+    a { color: 	#FFFFFF; } /* CSS link color */
+  </style>
+                <% for(let i = 0; i < botdata.commands.length; i++) { 
+              %>
+              <% count = i+1 %>
+              <% let xd = botdata.commands[i]; %>
+              <% let des = db.fetch(`${botdata.stoken}_${xd}_${bot.user.id}`); %>
+              <% if(des) { %>
+								<tr>
+									<td><%- count %></td>
+									<td><%- xd %></td>
+									<td><%- des %></td>
+									<td>
+										<span class="dot">
+											<i class="bg-success"></i>
+											Working
+										</span>
+									</td>
+									<td>	
+                  
+							<a href="https://bcfd.dhvitop.repl.co/bot/<%- bot.user.id %>/command/<%- xd %>"  class="fas fa-edit"></a><a href=" https://bcfd.dhvitop.repl.co/bot/<%- bot.user.id %>/command/<%- xd %>/delete" class="fas fa-trash-alt" >
+							
+							</a>
+								
+						
+           
+						</td>
+								</tr>
+                <% } %>
+                <% } %>
+								
+                
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+    </div>
+	</div>	
+	<!-- end main content -->
+	<!-- import script -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<!-- end import script -->
+</body>
+</html>
