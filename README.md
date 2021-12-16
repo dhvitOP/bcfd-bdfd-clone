@@ -14,3 +14,6 @@ First of all star otherwise i will eat your icecream
 So, After Setting up the whole Project go in https://yourwebsite.com/bots and replace yourwebsite.com with your website where you hosted it (if hosting on your pc/locally than it will be https://localhost:8000/bots)
 # Example 
 You can find a demo/example website at https://bcfd.dhvitop.repl.co/bots
+# Creators Credits
+Frontend/Html and Css are made by ItsmCraft and AdiOS (my friends)
+Backend By me
