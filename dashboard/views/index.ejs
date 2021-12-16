@@ -11,6 +11,7 @@
 
 	<!-- end sidebar -->
 	<!-- main content -->
+  <div class="commands-bg">
 	<div class="wrapper">
 		<div class="row">
 			<div class="col-3 col-m-6 col-sm-6">
@@ -28,7 +29,7 @@
 						<i class="fas fa-align-justify"></i>
 					</p>
 					<h3><%- hostingtime %></h3>
-					<p>Online Time/uptime</p>
+					<p>Uptime</p>
 				</div>
 			</div>
       
@@ -37,7 +38,7 @@
 					<p>
 						<i class="fas fa-check-circle"></i>
 					</p>
-					<h3><%- jservers %></h3>
+					<h3><%- `${jservers ? jservers : 0}` %></h3>
 					<p>Servers Joined Today</p>
 				</div>
 			</div>
@@ -46,13 +47,13 @@
 					<p>
 						<i class="fas fa-bug"></i>
 					</p>
-					<h3><%- lservers %></h3>
+					<h3><%- `${lservers ? lservers : 0}` %></h3>
 					<p>Servers Left Today</p>
 				</div>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-8 col-m-12 col-sm-12">
+			<div class="col-12 col-m-12 col-sm-12">
 				<div class="card">
 					<div class="card-header">
 						<h3>
@@ -72,11 +73,12 @@
 								</tr>
 							</thead>
 							<tbody>
+              <% let i = 0; %>
               <% bot.guilds.cache.forEach((guildxd) => { %>
-              
+              <% i = i+1 %>
 								<tr>
                   <% let guild = bot.guilds.cache.get(guildxd.id); %>
-									<td>Server</td>
+									<td><%- i %></td>
 									<td><%- guild.name %></td>
 									<td><%-  guild.id%></td>
 									<td>
@@ -97,7 +99,7 @@
 	<!-- end main content -->
 	<!-- import script -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-	<script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<script src="https://<%- req.get('host') %>/js/index.js"></script>
 	<!-- end import script -->
 </body>
 </html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BHFD | Bot Hoster For Discord</title>
+
+	<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+	<link rel="icon" type="image/png" href="https://cdn.discordapp.com/attachments/889759169362690058/903341813597864087/1c54f7b06d7723c21afc5035bf88a5ef.png"/>
+
+	<!-- Import lib -->
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
+	<link rel="stylesheet" type="text/css" href="https://<%- req.get('host') %>/css/fontawesome-free/css/all.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+	<!-- End import lib -->
+
+	<link rel="stylesheet" type="text/css" href="https://<%- req.get('host') %>/css/style.css">
+</head>
+	<div class="navbar">
+		<!-- nav left -->
+		<ul class="navbar-nav">
+			<li class="nav-item">
+				<a class="nav-link">
+				
+				</a>
+			</li>
+			<li class="nav-item">
+				<img src="https://files.startupranking.com/startup/thumb/753829_5c1fe96d1f7af6a0c878b66833991a42e80b294c_logo-bot_m.jpeg" alt="ATPro logo" class="logo logo-light">
+				<img src="https://files.startupranking.com/startup/thumb/753829_5c1fe96d1f7af6a0c878b66833991a42e80b294c_logo-bot_m.jpeg" alt="ATPro logo" class="logo logo-dark">
+			</li>
+		</ul>
+		<!-- end nav left -->
+		<!-- form -->
+	
+		<!-- end form -->
+		<!-- nav right -->
+		<ul class="navbar-nav nav-right">
+
+			
+			<li class="nav-item avt-wrapper">
+				<div class="avt dropdown">
+					<img src="https://cdn.discordapp.com/avatars/<%= req.user.id %>/<%= req.user.avatar %>.webp" alt="User image" class="dropdown-toggle" data-toggle="user-menu">
+					<ul id="user-menu" class="dropdown-menu">
+				
+			
+					<li  class="dropdown-menu-item">
+							<a href="https://<%- req.get('host') %>/bots" class="dropdown-menu-link">
+								<div>
+									<i class="fas fa-robot"></i>
+								</div>
+								<span>Bots</span>
+							</a>
+						</li>
+            <li  class="dropdown-menu-item">
+							<a href="https://<%- req.get('host') %>/createbot" class="dropdown-menu-link">
+								<div>
+									<i class="fas fa-plus"></i>
+								</div>
+								<span>Create Bot</span>
+							</a>
+						</li>
+						<li  class="dropdown-menu-item">
+							<a href="https://<%- req.get('host') %>/logout" class="dropdown-menu-link">
+								<div>
+									<i class="fas fa-sign-out-alt"></i>
+								</div>
+								<span>Logout</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+			</li>
+		</ul>
+		<!-- end nav right -->
+	</div>
+<body class="overlay-scrollbar">
+	<!-- navbar -->
+	
+	<!-- end sidebar -->
+	<!-- main content -->
+ <div class="commands-bg">
+	 <div class="wrapper">
+		<div class="row">
+			<div class="col-12 col-m-12 col-sm-12">
+				<div class="card">
+					<div class="card-header">
+						<h3>
+							Create Bot
+						</h3>
+		
+					</div>
+					<div class="card-content">
+  
+        
+            
+						<form class="card-form" method= "POST">
+							<h4>Bot Token</h4>
+						<input maxlength="100" name="bottoken" id="bottoken" type="text" placeholder="Your Bot Token" class="card-input">
+						
+						
+            <button type="submit" name="btnSubmit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
+						</form>
+           
+					</div>
+				</div>
+			</div>
+    </div>
+	</div>	
+	<!-- end main content -->
+	<!-- import script -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+	<script src="https://<%- req.get('host') %>/js/index.js"></script>
+	<!-- end import script -->
+</body>
+</html>

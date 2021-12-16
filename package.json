@@ -3,11 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "login": "railway login",
-    "start": "node .",
-    "linkp": "railway link 6bf57725-c587-4ecc-ad8b-2118e0410383",
-    "setrun": "railway run npm start",
-    "deploy": "railway up"
+"start": "node ."
   },
   "keywords": [],
   "author": "",

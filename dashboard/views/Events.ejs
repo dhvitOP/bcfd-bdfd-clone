@@ -54,7 +54,7 @@
 									</td>
 										<td>	
                   
-							<a href="https://bcfd.dhvitop.repl.co/bot/<%- bot.user.id %>/event/<%- xd %>"  class="fas fa-edit"></a><a href=" https://bcfd.dhvitop.repl.co/bot/<%- bot.user.id %>/event/<%- xd %>/delete" class="fas fa-trash-alt" >
+							<a href="https://<%- req.get('host') %>/bot/<%- bot.user.id %>/event/<%- xd %>"  class="fas fa-edit"></a><a href=" https://<%- req.get('host') %>/bot/<%- bot.user.id %>/event/<%- xd %>/delete" class="fas fa-trash-alt" >
 							
 							</a>
 								
@@ -74,7 +74,7 @@
 	<!-- end main content -->
 	<!-- import script -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-	<script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<script src="https://<%- req.get('host') %>/js/index.js"></script>
 	<!-- end import script -->
 </body>
 </html>

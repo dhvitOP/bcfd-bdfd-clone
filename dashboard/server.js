@@ -2,13 +2,18 @@ const url = require("url");
 const path = require("path");
 const express = require("express");
 const passport = require("passport");
+let codeshare = require("../codeshare.js");
 const session = require("express-session");
 const Strategy = require("passport-discord").Strategy;
 const ejs = require("ejs");
+const config = require("../config.js");
+
 const bodyParser = require("body-parser");
 const Discord = require("discord.js");
+let { Intents } = require("discord.js");
 //const config = require("../config.js");
 let main = require("../index.js");
+
 const botsdata = require("../model.js");
 const app = express();
 const MemoryStore = require("memorystore")(session);
@@ -22,11 +27,11 @@ const db = require("quick.db");
 const { SlashCommandBuilder } = require('@discordjs/builders');
  const request = require('request');
  const moment = require("moment");
-module.exports = async(globalbots) => {
-  sleep(5000)
-  
+module.exports = async(globalbots , login) => {
+
+
     let allbots = globalbots;
-      let mclient = globalbots.get("828988542440702049");
+      let mclient = globalbots.get(config.botid);
       
 
   var minifyHTML = require('express-minify-html-terser');
@@ -46,20 +51,19 @@ module.exports = async(globalbots) => {
   const templateDir = path.resolve(`${process.cwd()}${path.sep}src/views`);
   app.use("/css", express.static(`./dashboard/assets/css`));
   app.use("/js", express.static(`./dashboard/assets/js`));
- console.log("it got started");
+ console.log("<< Dashboard Started >>");
 
   passport.serializeUser((user, done) => done(null, user));
-  passport.deserializeUser((obj, done) => done(null, obj));
-
-  passport.use(new Strategy({
-    clientID: "828988542440702049",
-    clientSecret: "G3OJBhMcnYcjXziYHLWCEBTGT6JUMEZd",
-    callbackURL: "https://bcfd.dhvitop.repl.co/callback",      
+  passport.deserializeUser((obj, done) => done(null, obj)); passport.use(new Strategy({
+    clientID: config.botid,
+    clientSecret: config.botsecret,
+    callbackURL: config.callback,      
     scope: ["identify", "guilds"]
   },
   (accessToken, refreshToken, profile, done) => { 
     process.nextTick(() => done(null, profile));
   }));
+ 
 
   app.use(session({
     store: new MemoryStore({ checkPeriod: 86400000 }),
@@ -89,22 +93,84 @@ module.exports = async(globalbots) => {
 
     let chek = await botsdata.findOne({botID: req.params.botID});
      if(chek) {
-       /* if(chek.ownerid != req.user.id)
+        if(chek.ownerid != req.user.id)
        {
-         return res.redirect("https://bcfd.dhvitop.repl.co/not-owner");
-       } else { */
+         return res.redirect("https://" + req.get('host') + "/not-owner");
+       } else { 
          return next();
-       //} 
+       } 
      }
      
   }
+app.get("/createbot", checkAuth, async(req,res) => {
+  res.render("createbot.ejs", {req: req});
+})
+app.post("/createbot", checkAuth, async(req,res) => {
+  try { 
+     let bot = new Discord.Client({ intents: [
+      Intents.FLAGS.GUILDS,
+     
 
+   
+             
+          
+    ],
+                           });
+await bot.login(req.body.bottoken);
+       let botsxd = await botsdata.find()
+       let bots = botsxd.filter(a => a.ownerid === req.user.id);
+       if(bots && bots.length === 2 || bots.length > 2)
+       {
+          return res.redirect("https://" + req.get('host') + "/bots?error=true&message=You can only create 2 bots.")
+       }
+       
+       let botid = bot.user.id;
+      var avatar = bot.user.displayAvatarURL({size: 4096, dynamic: true})
+      let botname = bot.user.username;
+   await bot.destroy();
+   
+    let xd = globalbots.get(botid);
+    if(xd)
+    {
+      res.redirect("https://" + req.get('host') + "/bot/"+ botid + "?error=true&message=Bot Already Exist.");
+      return;
+    }
+     login(req.body.bottoken);
+      let lol = makeToken(128);
+   
+            await new botsdata({
+           botID: botid, 
+                ownerid: req.user.id,
+                avatarurl: avatar,
+                botname: botname,
+                stoken: lol
+              }).save()
+     
+
+  await botsdata.findOneAndUpdate({botID: botid},{$set: {token: req.body.bottoken}})
+ 
+  setTimeout(() => {
+res.redirect("https://" + req.get('host') + "/bot/"+ botid + "?success=true&message=Bot Created.");
+  }, 3000);
+
+       
+   } catch (err) {
+    console.log(err + "ERROR ON CREATING  BOT");
+     res.redirect("https://" + req.get('host') + "/createbot?error=true&message=Bot Token Invalid.");
+    
+       return;
+  }
+    
+ 
+  
+  
+})
  app.get("/bot/:botID", checkAuth, checkOwner, async(req,res) => {
      let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
      let bot = allbots.get(req.params.botID);
-    
-     res.render("lol.ejs", {
+    if(!bot) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.")
+     res.render("index.ejs", {
         req: req,
     	bot: bot,
         botdata: chek,
@@ -113,6 +179,26 @@ module.exports = async(globalbots) => {
     })
 
  })
+  app.get("/bot/:botID/delete", checkAuth, checkOwner, async(req,res) => {
+     let chek = await botsdata.findOne({botID: req.params.botID});
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
+     chek.commands.forEach(async(cmdname) => {
+       if(!cmdname)return;
+      chek.stoken +  chek.stoken +       db.delete(`${chek.stoken}_${cmdname}_${req.params.botID}`);
+     db.delete(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${cmdname}_${req.params.botID}`);
+     })
+     chek.events.forEach(async(evname) => {
+       if(!evname) return;
+      db.delete(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${evname}_${req.params.botID}`);
+    
+     })
+     await botsdata.deleteOne({botID: req.params.botID});
+     res.redirect("https://" + req.get('host') + "/bots?success=true&message=Bot Deleted")
+    
+    
+
+ })
+ 
   app.get("/bots", checkAuth, async(req,res) => {
   
   
@@ -129,7 +215,7 @@ module.exports = async(globalbots) => {
  })
   app.get("/bot/:botID/settings", checkAuth, checkOwner, async(req,res) => {
      let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
     let prefix = db.fetch(chek.stoken + `prefix_${req.params.botID}`) || ".";
     let status = db.fetch(chek.stoken + `status_${req.params.botID}`) || "Made by BCFD";
      res.render("Setting.ejs", {
@@ -144,24 +230,24 @@ module.exports = async(globalbots) => {
  })
   app.post("/bot/:botID/settings", checkAuth, checkOwner, async(req,res) => {
      let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
-    if(!req.body.botname) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bot?error=true&message=Bot Does Not Exist.");
+    if(!req.body.botname) return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/settings?error=true&message=Give a Bot Name.");
 
 
-if(!req.body.botprefix) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
-if(!req.body.botstatus) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+if(!req.body.botprefix) return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/settings?error=true&message=Give a Bot Prefix.");
+if(!req.body.botstatus) return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/settings?error=true&message=Give a Bot Status.");
  let bot = allbots.get(req.params.botID);
  bot.user.setUsername(req.body.botname);
  await bot.user.setPresence({ activities: [{ name: req.body.botstatus }] });
  db.set(chek.stoken + `prefix_${req.params.botID}`, req.body.botprefix);
  db.set(chek.stoken + `status_${req.params.botID}`, req.body.botstatus);
- return res.redirect("https://bcfd.dhvitop.repl.co/bot/"+ req.params.botID + "/settings");
+ return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/settings");
     
  })
  app.get("/bot/:botID/cc", checkAuth, checkOwner, async(req,res) => {
     let chek = await botsdata.findOne({botID: req.params.botID});
      if(!chek) return res.redirect
-     ("https://bcfd.dhvitop.repl.co/xd");
+     ("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
      res.render("Create Command.ejs", {
         req: req,
     	bot: allbots.get(req.params.botID),
@@ -172,26 +258,40 @@ if(!req.body.botstatus) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
  })
  app.post("/bot/:botID/cc", checkAuth, checkOwner, async(req, res) => {
     let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/no-bot");
-     if(!req.body.cmdname) return res.redirect("https://bcfd.dhvitop.repl.co/no-cmdname");
-     if(!req.body.cmddes) return res.redirect("https://bcfd.dhvitop.repl.co/no-cmddes");
-     if(!req.body.cmddata) return res.redirect("https://bcfd.dhvitop.repl.co/no-cmddata");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
+     if(!req.body.cmdname) return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/commands?error=true&message=Give a Command name.");
+     if(!req.body.cmddes) return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/commands?error=true&message=Give a Bot Description.");
+     if(!req.body.cmddata) return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/commands?error=true&message=Give a Bot Code.");
      if(db.has(`${chek.stoken}_${req.body.cmdname}_${req.params.botID}`))
-     {return res.redirect("https://bcfd.dhvitop.repl.co/cmd-already-exist");
+     {return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/commands?error=true&message=Command Already Exist.");
 
      }
      let client = allbots.get(req.params.botID);
      let lol = req.body.cmdname;
      let cmdname = lol.toLowerCase();
-      var data = new SlashCommandBuilder()
+        var data = req.body.cmddata;
+      var dataxd = new SlashCommandBuilder()
 
   .setName(cmdname)
 
 .setDescription(req.body.cmddes.toLowerCase())
 var xd = []
-xd.push(data)
+xd.push(dataxd)
 await client.application.commands.set(xd);
-     db.set(`DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.body.cmdname}_${req.params.botID}`, req.body.cmddata);
+
+data = `var db = require("quick.db")\n ${data}`;
+if(data.includes("db."))
+  {
+    data = data.replace("db.fetch(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.set(", " db.set(botdata.stoken +");
+    data = data.replace("db.delete(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.add(", " db.add(botdata.stoken +");
+  data = data.replace("db.subtract(", " db.subtract(botdata.stoken +");
+    data =  data.replace("db.push(", "db.push(botdata.stoken +");
+    
+    
+  }
+     db.set( chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.body.cmdname}_${req.params.botID}`, data);
      db.set(`${chek.stoken}_${req.body.cmdname}_${req.params.botID}`, req.body.cmddes);
  
          let cmdsto = chek.commands;
@@ -200,20 +300,30 @@ await client.application.commands.set(xd);
      await botsdata.findOneAndUpdate({botID: req.params.botID},{$set: {commands: cmdsto}})
      
     
-     res.redirect(`https://bcfd.dhvitop.repl.co/bot/${req.params.botID}/command/${req.body.cmdname}`);
+     res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/command/${req.body.cmdname}?success=true&message=Created Command`);
     
  })
  app.get("/bot/:botID/command/:cmdname", checkAuth, checkOwner, async(req, res) => {
    let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/no-bot");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
      let cmdname = req.params.cmdname;
 
      let cmddes = db.fetch(`${chek.stoken}_${req.params.cmdname}_${req.params.botID}`);
      if(!cmddes)
      {
-       return res.redirect("https://bcfd.dhvitop.repl.co/no-cmd-exist");
+       return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/comchek.stoken + mchek.stoken + ands?error=true&message=Command Doesn't Exist");
      }
-     let cmddata = db.fetch(`DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.params.cmdname}_${req.params.botID}`);
+     let data = db.fetch(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.params.cmdname}_${req.params.botID}`);
+      if(data.includes("db"))
+  {
+    data = data.replace("db.fetch(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.set(", " db.set(botdata.stoken +");
+    data = data.replace("db.delete(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.add(", " db.add(botdata.stoken +");
+    data = data.replace("db.subtract(", " db.subtract(botdata.stoken +");
+    data = data.replace("db.push(", "db.push(botdata.stoken +");
+  }
+    
      res.render("Create Command.ejs", {
        req: req,
     	bot: allbots.get(req.params.botID),
@@ -222,18 +332,18 @@ await client.application.commands.set(xd);
         type: "edit",
         cmdname: cmdname,
         cmddes: cmddes,
-        cmddata: cmddata
+        cmddata: data
     })
  })
   app.post("/bot/:botID/command/:cmdname", checkAuth, checkOwner, async(req, res) => {
    let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/no-bot");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
   
-     if(!req.body.cmdname) return res.redirect("https://bcfd.dhvitop.repl.co/no-cmdname");
-     if(!req.body.cmddes) return res.redirect("https://bcfd.dhvitop.repl.co/no-cmddes");
-     if(!req.body.cmddata) return res.redirect("https://bcfd.dhvitop.repl.co/no-cmddata");
+     if(!req.body.cmdname) return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/command/" + req.params.cmdname + "?error=true&message=Give me Command Name");
+     if(!req.body.cmddes) return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/command/" + req.params.cmdname + "?error=true&message=Give me Command Description");
+     if(!req.body.cmddata) return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/command/" + req.params.cmdname + "?error=true&message=Give me Command Code");
   
-     if(db.has(`DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.body.cmdname}_${req.params.botID}`))
+     if(db.has(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.body.cmdname}_${req.params.botID}`))
      {
 
      } else {
@@ -241,29 +351,38 @@ await client.application.commands.set(xd);
    cmdsto.shift(`${req.params.cmdname}`);
    cmdsto.push(`${req.body.cmdname}`);
  //  console.log(cmdsto);
-     await botsdata.findOneAndUpdate({botID: req.params.botID},{$set: {commands: cmdsto}})
-     db.delete(`DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.params.cmdname}_${req.params.botID}`);
-     db.delete(`${chek.stoken}_${req.params.cmdname}_${req.params.botID}`);
+     await botsdata.findchek.stoken +Ochek.stoken + neAndUpdate({botID: req.params.botID},{$set: {commands: cmdsto}})
+     db.delete(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.params.cmdname}_${req.params.botID}`);
+     db.delete(`${chek.stchek.stoken + oken}_${req.params.cmdname}_${req.params.botID}`);
      }
-     
-        db.set(`DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.body.cmdname}_${req.params.botID}`, req.body.cmddata);
+       
+        db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.body.cmdname}_${req.params.botID}`, req.body.cmddata);
      db.set(`${chek.stoken}_${req.body.cmdname}_${req.params.botID}`, req.body.cmddes);
      
     
-     res.redirect(`https://bcfd.dhvitop.repl.co/bot/${req.params.botID}/command/${req.body.cmdname}`);
+     res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/command/${req.body.cmdname}?success=true&message=Successful`);
      
  })
   app.get("/bot/:botID/event/:cmdname", checkAuth, checkOwner, async(req, res) => {
    let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/no-bot");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
      let evname = req.params.cmdname;
 
    
-     let evdata = db.fetch(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${req.params.cmdname}_${req.params.botID}`);
-     if(!evdata || !evname)
+     let data = db.fetch(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${req.params.cmdname}_${req.params.botID}`);
+     if(!data || !evname)
      {
-       return res.redirect("/no-event-exist");
+       return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/event/" + req.params.cmdname + "?error=true&message=Event Doesn't Exist");
      }
+     if(data.includes("db"))
+  {
+    data = data.replace("db.fetch(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.set(", " db.set(botdata.stoken +");
+    data = data.replace("db.delete(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.add(", " db.add(botdata.stoken +");
+    data = data.replace("db.subtract(", " db.subtract(botdata.stoken +");
+    data = data.replace("db.push(", "db.push(botdata.stoken +");
+  }
      res.render("Create Events.ejs", {
         req: req,
     	bot: allbots.get(req.params.botID),
@@ -272,23 +391,33 @@ await client.application.commands.set(xd);
         type: "edit",
         evname: evname,
         
-        evdata: evdata
+        evdata: data
     })
  })
   app.post("/bot/:botID/event/:cmdname", checkAuth, checkOwner, async(req, res) => {
    let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/no-bot");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
    
-     if(!req.body.evname) return res.redirect("https://bcfd.dhvitop.repl.co/no-eventname");
+     if(!req.body.evname) return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/event/" + req.params.cmdname + "?error=true&message=Give me Event Name");
      
-     if(!req.body.evdata) return res.redirect("https://bcfd.dhvitop.repl.co/no-eventdata");
-  
-   
+     if(!req.body.evdata) return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/event/" + req.params.cmdname + "?error=true&message=Give me Event Code");
+     let data = req.body.evdata;
+   if(data.includes("db"))
+  {
+    data = data.replace("db.fetch(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.set(", " db.set(botdata.stoken +");
+    data = data.replace("db.delete(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.add(", " db.add(botdata.stoken +");
+    data = data.replace("db.subtract(", " db.subtract(botdata.stoken +");
+    data = data.replace("db.push(", "db.push(botdata.stoken +");
+    
+    
+  }
          if(req.body.evname === "messagecreate")
    {
-     db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_events_message_${req.params.botID}`, req.params.evdata);
+     db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_events_message_${req.params.botID}`, data);
    } else {
-      db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${req.body.evname}_${req.params.botID}`, `${req.body.evdata}`);
+      db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${req.body.evname}_${req.params.botID}`, data);
    }
    if(db.has(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${req.body.evname}_${req.params.botID}`))
    {
@@ -304,12 +433,12 @@ await client.application.commands.set(xd);
    }
    
     
-     res.redirect(`https://bcfd.dhvitop.repl.co/bot/${req.params.botID}/event/${req.body.evname}`);
+     res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/event/${req.body.evname}?success=true&message=Successful`);
      
  })
  app.get("/bot/:botID/commands", checkAuth, checkOwner, async(req,res) => {
     let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/xd");
      res.render("Commands.ejs", {
         req: req,
     	bot: allbots.get(req.params.botID),
@@ -319,29 +448,29 @@ await client.application.commands.set(xd);
  })
   app.get("/bot/:botID/command/:cmdname/delete", checkAuth, checkOwner, async(req,res) => {
     let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
      let cmddes = db.fetch(`${chek.stoken}_${req.params.cmdname}_${req.params.botID}`);
      if(!cmddes)
      {
-       return res.redirect("https://bcfd.dhvitop.repl.co/no-cmd-exist");
+       return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/command/" + req.params.cmdname + "?error=true&message=Command Doesn't Exist");
      }
-     db.delete(`${chek.stoken}_${req.params.cmdname}_${req.params.botID}`);
-     db.delete(`DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.params.cmdname}_${req.params.botID}`);
+     db.dchek.stoken +echek.stoken + lete(`${chek.stoken}_${req.params.cmdname}_${req.params.botID}`);
+     db.delete(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.params.cmdname}_${req.params.botID}`);
      let cmdsto = chek.commands;
    cmdsto.shift(`${req.params.cmdname}`);
   
  //  console.log(cmdsto);
      await botsdata.findOneAndUpdate({botID: req.params.botID},{$set: {commands: cmdsto}})
-    res.redirect(`https://bcfd.dhvitop.repl.co/bot/${req.params.botID}/commands`);
+    res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/commands?success=true&message=Deleted Command`);
      
  })
    app.get("/bot/:botID/event/:evname/delete", checkAuth, checkOwner, async(req,res) => {
     let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
      let cmddes = db.fetch(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${req.params.evname}_${req.params.botID}`);
      if(!cmddes)
      {
-       return res.redirect("https://bcfd.dhvitop.repl.co/no-event-exist");
+       return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/events?error=true&message=Event Doesn't Exist");
      }
      db.delete(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${req.params.evname}_${req.params.botID}`);
     
@@ -350,12 +479,12 @@ await client.application.commands.set(xd);
   
  //  console.log(cmdsto);
      await botsdata.findOneAndUpdate({botID: req.params.botID},{$set: {events: cmdsto}})
-    res.redirect(`https://bcfd.dhvitop.repl.co/bot/${req.params.botID}/events`);
+    res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/events?success=true&message=Deleted Event`);
      
  })
   app.get("/bot/:botID/events", checkAuth, checkOwner, async(req,res) => {
     let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/xd");
      res.render("Events.ejs", {
         req: req,
     	bot: allbots.get(req.params.botID),
@@ -365,7 +494,7 @@ await client.application.commands.set(xd);
  })
   app.get("/bot/:botID/ce", checkAuth, checkOwner, async(req,res) => {
     let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/xd");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/xd");
      res.render("Create Events.ejs", {
         req: req,
     	bot: allbots.get(req.params.botID),
@@ -377,27 +506,101 @@ await client.application.commands.set(xd);
 
   app.post("/bot/:botID/ce", checkAuth, checkOwner, async(req, res) => {
     let chek = await botsdata.findOne({botID: req.params.botID});
-     if(!chek) return res.redirect("https://bcfd.dhvitop.repl.co/no-bot");
-     if(!req.body.evname) return res.redirect("https://bcfd.dhvitop.repl.co/no-evname");
+     if(!chek) return res.redirect("https://" + req.get('host') + "/bots?error=true&message=Bot Does Not Exist.");
+     if(!req.body.evname) return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/ce?error=true&message=Give me an Event Name");
     
-     if(!req.body.evdata) return res.redirect("https://bcfd.dhvitop.repl.co/no-evdata");
+     if(!req.body.evdata) return res.redirect("https://" + req.get('host') + "/bot/"+ req.params.botID + "/ce?error=true&message=Give me an Event Code");
      let vxd = req.body.evname;
      let vent = vxd.toLowerCase();
+    var data = `var db = require("quick.db")\n ${req.body.evdata}`;
+     if(req.body.evdata.includes("db."))
+  {
+     data = data.replace("db.fetch(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.set(", " db.set(botdata.stoken +");
+    data = data.replace("db.delete(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.add(", " db.add(botdata.stoken +");
+    data = data.replace("db.subtract(", " db.subtract(botdata.stoken +");
+    data = data.replace("db.push(", "db.push(botdata.stoken +");
+    
+    
+  }
+
      if(vent === "messagecreate")
    {
-     db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_events_message_${req.params.botID}`, req.body.evdata);
+     db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_events_message_${req.params.botID}`, data);
    } else {
      
-      db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${vent}_${req.params.botID}`, `${req.body.evdata}`);
+      db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_events_${vent}_${req.params.botID}`, `${data}`);
    }
+   
        let cmdsto = chek.events;
    cmdsto.push(`${vent}`);
  //  console.log(cmdsto);
      await botsdata.findOneAndUpdate({botID: req.params.botID},{$set: {events: cmdsto}})
 
-     res.redirect(`https://bcfd.dhvitop.repl.co/bot/${req.params.botID}/event/${vent}`);
+     res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/event/${vent}?success=true&message=Event Created`);
     
  })
+ app.get("/import/:cmdname/:ownerid", checkAuth, async(req, res) => {
+
+
+       let urlxd = req.url;
+       urlxd = urlxd.replace("import/", "importinbot/");
+     let bots = await botsdata.find();
+     res.render("cbots.ejs", {
+        req: req,
+    	allbots: allbots,
+   
+      url: urlxd,
+        db: db,
+       botsdata: bots
+    })
+
+   })
+   app.get("/importinbot/:cmdname/:ownerid/:botID", checkAuth, async(req, res) => {
+      let cmdname = req.params.cmdname;
+     let ownerid = req.params.ownerid;
+     let xdd = await codeshare.find();
+     let chek = xdd.filter(a => a.command == req.params.cmdname && a.owner == req.params.ownerid);
+     if(!chek || !chek[0]) return res.redirect("https://" + req.get('host') + "?error=true&message=Owner ID or Command Name is Wrong");
+     let botdata = await botsdata.findOne({botID: req.params.botID});
+     
+       let client = allbots.get(req.params.botID);
+       if(!client)return res.redirect(`https://` + req.get('host') + `/import/${req.params.cmdname}/${req.params.ownerid}`);
+    
+     cmdname = cmdname.toLowerCase();
+           var data = chek[0].cmdcode;
+      var dataxd = new SlashCommandBuilder()
+ 
+  .setName(cmdname)
+
+.setDescription("Check and try it out");
+var xd = []
+xd.push(dataxd)
+await client.application.commands.set(xd);
+
+data = `var db = require("quick.db")\n ${data}`;
+if(data.includes("db."))
+  {
+    data = data.replace("db.fetch(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.set(", " db.set(botdata.stoken +");
+    data = data.replace("db.delete(", " db.fetch(botdata.stoken +");
+    data = data.replace("db.add(", " db.add(botdata.stoken +");
+    data = data.replace("db.subtract(", " db.subtract(botdata.stoken +");
+    data =  data.replace("db.push(", "db.push(botdata.stoken +");
+    
+    
+  }
+     db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${cmdname}_${req.params.botID}`, data);
+     db.set(`${botdata.stoken}_${cmdname}_${req.params.botID}`, "Check and Try it out");
+        
+         let cmdsto = botdata.commands;
+   cmdsto.push(`${cmdname}`);
+ //  console.log(cmdsto);
+     await botsdata.findOneAndUpdate({botID: req.params.botID},{$set: {commands: cmdsto}})
+     res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/command/${req.params.cmdname}`)
+   })
+
  app.get("/login", (req, res, next) => {
     if (req.session.backURL) {
       req.session.backURL = req.session.backURL; 
@@ -431,6 +634,7 @@ await client.application.commands.set(xd);
       
       
   });
+
   app.get("/logout", function (req, res) {
     req.session.destroy(() => {
       req.logout();
@@ -438,6 +642,10 @@ await client.application.commands.set(xd);
     });
   });
    app.listen(8000)
+   /* CODESHARE COMMANDS IMPORT */
+   /* CODESHARE COMMANDS IMPORT */
+   /* CODESHARE COMMANDS IMPORT */
+   
 }
 function sleep(milliseconds) {
   const date = Date.now();
@@ -462,4 +670,13 @@ function sleep(milliseconds) {
     
 		return xd;
 	}
+  function makeToken(length) {
+  var result = '';
+  var characters = '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+<>?:{}=-]';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
 

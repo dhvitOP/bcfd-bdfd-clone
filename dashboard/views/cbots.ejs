@@ -26,10 +26,16 @@ transition: 0.5s;
 				<div class="counter" style="background-color:#23242D;">
         
 					<h1 style="font-size:55;">
-          Select a bot
+          Select a bot to import command in
           </h1>
 				</div>
 			</div>
+      <script>
+        function select(botid){ 
+         if(!botid)return;
+         location.href = `<%- url %>/${botid}`;
+        }
+      </script>
      <% botsdata.forEach((botxd) => {
      if(botxd.ownerid != req.user.id) return
       
@@ -42,7 +48,7 @@ transition: 0.5s;
 
         
         
-           <button type="submit" name="btnSubmit" class="bot-btn" onclick="location.href = 'https://<%- req.get('host') %>/bot/<%- botxd.botID%>'">Select</button>
+           <button type="submit" name="btnSubmit" class="bot-btn" onclick="select('<%- botxd.botID %>')">Select</button>
 
        
 			</div>
