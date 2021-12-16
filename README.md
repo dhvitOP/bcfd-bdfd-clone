@@ -9,3 +9,6 @@ Please Star if you liked this project and fork it if you want to use it also mak
 Also It is fully made by me lol
 # Problems 
 Having Errors? Create Issue or contact me on Discord my tag is - DHVIT#7547
+# Important 
+First of all star otherwise i will eat your icecream
+So, After Setting up the whole Project go in https://yourwebsite.com/bots and replace yourwebsite.com with your website where you hosted it (if hosting on your pc/locally than it will be https://localhost:8000/bots)
