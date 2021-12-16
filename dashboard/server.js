@@ -54,7 +54,8 @@ module.exports = async(globalbots , login) => {
  console.log("<< Dashboard Started >>");
 
   passport.serializeUser((user, done) => done(null, user));
-  passport.deserializeUser((obj, done) => done(null, obj)); passport.use(new Strategy({
+  passport.deserializeUser((obj, done) => done(null, obj));
+ passport.use(new Strategy({
     clientID: config.botid,
     clientSecret: config.botsecret,
     callbackURL: config.callback,      
@@ -625,7 +626,7 @@ if(data.includes("db."))
                 url: `https://discordapp.com/api/v8/guilds/875661895951056897/members/${req.user.id}`,
                 method: "PUT",
                 json: { access_token: req.user.accessToken },
-                headers: { "Authorization": `Bot ODI4OTg4NTQyNDQwNzAyMDQ5.YGxlvg.kiRMfSPNRzwcJ_e7XJacM-4g700` }
+                headers: { "Authorization": `Bot ${config.bottoken}` }
             });
    
       res.redirect(req.session.backURL || '/')
