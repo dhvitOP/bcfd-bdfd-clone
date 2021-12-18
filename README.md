@@ -15,5 +15,5 @@ So, After Setting up the whole Project go in https://yourwebsite.com/bots and re
 # Example 
 You can find a demo/example website at https://bcfd.dhvitop.repl.co/bots
 # Creators Credits
-Frontend/Html and Css are made by ItsmCraft and AdiOS (my friends)
+Frontend/Html and Css are made by itsMcraft#9988  and AdiOS#1754 (my friends)
 Backend By me
