@@ -1,5 +1,40 @@
 <!DOCTYPE html>
 <html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+<body>
+<script type="text/javascript">
+var urlParams = new URLSearchParams(window.location.search);
+  if(urlParams.has('error') && urlParams.get('error')){
+    Swal.fire({
+     icon: 'error',
+     title: 'Oops...',
+     text: urlParams.get('message'),
+     footer: 'Copyright 2021 &copy ClientLabs - All right reserved.'
+    }).then((result) => {
+  if (result.isConfirmed) {
+
+  }
+  })
+  }
+     if(urlParams.has('success') && urlParams.get('success')){
+    Swal.fire({
+     icon: 'success',
+     title: 'Succesfull...',
+     closeOnConfirm: false,
+     text: urlParams.get('message'),
+     footer: 'Copyright 2021 &copy ClientLabs - All right reserved.'
+    }).then((result) => {
+  if (result.isConfirmed) {
+   
+  }
+    
+})
+}
+
+</script>
+</body>
 <head>
 	<title>BHFD | Bot Hoster For Discord</title>
 
