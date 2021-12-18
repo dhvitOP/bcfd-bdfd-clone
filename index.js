@@ -58,7 +58,12 @@ async function start() {
 
 async function logins(token, botdata) {
   let botsdata = require("./model.js");
- if(!botdata || token) return;
+ if(!botdata || !token)  { 
+   
+   await botsdata.deleteOne({botID: botdata.botID})
+   return; 
+
+ }
   const { get } = require('./cc_list_test/sqlite.js')
   let client; 
     try {
