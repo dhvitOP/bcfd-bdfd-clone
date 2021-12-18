@@ -29,7 +29,7 @@
                         <input maxlength="50" name="botprefix" type="text" value="<%- prefix %>" class="card-input">
                            <button type="submit" name="btnSubmit" class="btn btn-primary"><i class="far fa-save"></i> Save</button>
                            	</form>
-                            <button type="submit" onclick<%- req.get('host') %>ttps://bcfd.dhvitop.repl.co/bot/<%- bot.user.id%>/delete'"name="btnDelete" class="btn btn-primary-delete"><i class="fas fa-trash"></i> Delete</button>
+                            <button type="submit" onclick="https://<%- req.get('host') %><%- bot.user.id%>/delete"class="btn btn-primary-delete"><i class="fas fa-trash"></i> Delete</button>
 					
 					</div>
 				</div>
@@ -38,7 +38,8 @@
 	</div>	
 	<!-- end main content -->
 	<!-- import script -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.<%- req.get('host') %>ipt src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min"></script>
+  <script src="https://bcfd.dhvitop.repl.co/js/index.js"></script>
 	<!-- end import script -->
 </body>
 </html>
