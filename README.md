@@ -4,13 +4,15 @@ Should know Basics of JS and Express also discord.js lol
 # Upcoming/Todo
 CodeShare from which you can import codes in your bot directly (Almost Made) <br>
 Add Slash Commands Options/Arguments for Commands
-# Info on Codeshare (Upcoming)
-For This I will be making a POST Method System, So that any codeshare website can integrate any of this project and add an code import system to their codeshare site. <br>
+# Info on Codeshare Integration (Done)
+For This Its making a POST Method System, So that any codeshare website can integrate any of this project and add an code import system to their codeshare site. <br>
 Only Discord.js Code Type will be supported (If i don't have any plan to add new language support) <br>
 
-# Lol Things
+# Notice
 Please Star if you liked this project and fork it if you want to use it also make sure of LICENSE, dont use this project without giving credits or without seeing LICENSE 
-Also It is fully made by me lol
+Also It is fully made by me xd <br>
+
+Date : 19 December, Time : 4:00PM IST  Added Codeshare Integration, Documentation of it will be coming soon
 # Features 
 Make Your own bot in 20 Seconds <br>
 Easy to Setup <br>
@@ -19,6 +21,7 @@ Slash Commands and Message Commands Both Are Supported. (You cannot create optio
 Bots are free to customize their settings. <br>
 Importing Commands from codeshare (Coming Soon almost ready) <br>
 Make Unlimited Commands for your bot!! <br>
+CodeShare Integration Support <br>
 # Getting Started
 First of all Clone this Project or Download it if you wanna run it on localhost/your own computer
 
