@@ -2,7 +2,7 @@ const url = require("url");
 const path = require("path");
 const express = require("express");
 const passport = require("passport");
-let codeshare = require("../codeshare.js");
+
 const session = require("express-session");
 const Strategy = require("passport-discord").Strategy;
 const ejs = require("ejs");
@@ -94,11 +94,12 @@ module.exports = async(globalbots , login) => {
 
     let chek = await botsdata.findOne({botID: req.params.botID});
      if(chek) {
-        if(chek.ownerid != req.user.id)
+        if(chek.ownerid === req.user.id)
        {
-         return res.redirect("https://" + req.get('host') + "/not-owner");
-       } else { 
          return next();
+        
+       } else { 
+         return res.redirect("https://" + req.get('host') + "/not-owner");
        } 
      }
      
@@ -136,7 +137,7 @@ await bot.login(req.body.bottoken);
       res.redirect("https://" + req.get('host') + "/bot/"+ botid + "?error=true&message=Bot Already Exist.");
       return;
     }
-     login(req.body.bottoken);
+    
       let lol = makeToken(128);
    
             await new botsdata({
@@ -149,7 +150,8 @@ await bot.login(req.body.bottoken);
      
 
   await botsdata.findOneAndUpdate({botID: botid},{$set: {token: req.body.bottoken}})
- 
+  let fr = await botsdata.findOne({botID: botid});
+   login(req.body.bottoken, fr);
   setTimeout(() => {
 res.redirect("https://" + req.get('host') + "/bot/"+ botid + "?success=true&message=Bot Created.");
   }, 3000);
@@ -270,7 +272,12 @@ if(!req.body.botstatus) return res.redirect("https://" + req.get('host') + "/bot
      let client = allbots.get(req.params.botID);
      let lol = req.body.cmdname;
      let cmdname = lol.toLowerCase();
+     let prefix = db.fetch(chek.stoken + `prefix_${req.params.botID}`)
+     if(cmdname.includes(prefix)) {
+       cmdname.replace(prefix, "");
+     }
         var data = req.body.cmddata;
+        try { 
       var dataxd = new SlashCommandBuilder()
 
   .setName(cmdname)
@@ -279,6 +286,10 @@ if(!req.body.botstatus) return res.redirect("https://" + req.get('host') + "/bot
 var xd = []
 xd.push(dataxd)
 await client.application.commands.set(xd);
+        } catch(error)
+        {
+          return res.redirect(`https://${req.get('host')}/cc&message=${error}`);
+        }
 
 data = `var db = require("quick.db")\n ${data}`;
 if(data.includes("db."))
@@ -310,11 +321,16 @@ if(data.includes("db."))
      let cmdname = req.params.cmdname;
 
      let cmddes = db.fetch(`${chek.stoken}_${req.params.cmdname}_${req.params.botID}`);
+
      if(!cmddes)
      {
        return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/comchek.stoken + mchek.stoken + ands?error=true&message=Command Doesn't Exist");
      }
      let data = db.fetch(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${req.params.cmdname}_${req.params.botID}`);
+       if(!data)
+     {
+       return res.redirect("https://" + req.get('host') + "/bot/" + req.params.botID + "/comchek.stoken + mchek.stoken + ands?error=true&message=Command Doesn't Exist");
+     }
       if(data.includes("db"))
   {
     data = data.replace("db.fetch(", " db.fetch(botdata.stoken +");
@@ -542,44 +558,47 @@ if(data.includes("db."))
      res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/event/${vent}?success=true&message=Event Created`);
     
  })
- app.get("/import/:cmdname/:ownerid", checkAuth, async(req, res) => {
+ app.post("/import", checkAuth, async(req, res) => {
 
-
+      
        let urlxd = req.url;
        urlxd = urlxd.replace("import/", "importinbot/");
      let bots = await botsdata.find();
      res.render("cbots.ejs", {
         req: req,
     	allbots: allbots,
-   
+      bodyshare: req.body,
       url: urlxd,
         db: db,
        botsdata: bots
     })
+    
 
    })
-   app.get("/importinbot/:cmdname/:ownerid/:botID", checkAuth, async(req, res) => {
-      let cmdname = req.params.cmdname;
-     let ownerid = req.params.ownerid;
-     let xdd = await codeshare.find();
-     let chek = xdd.filter(a => a.command == req.params.cmdname && a.owner == req.params.ownerid);
-     if(!chek || !chek[0]) return res.redirect("https://" + req.get('host') + "?error=true&message=Owner ID or Command Name is Wrong");
+   app.post("/import/:botID", checkAuth, async(req, res) => {
+      let cmdname = req.body.name;
+    
+
+  
      let botdata = await botsdata.findOne({botID: req.params.botID});
      
        let client = allbots.get(req.params.botID);
-       if(!client)return res.redirect(`https://` + req.get('host') + `/import/${req.params.cmdname}/${req.params.ownerid}`);
+       if(!client)return res.redirect(`https://` + req.get('host') + `/import/`);
     
      cmdname = cmdname.toLowerCase();
-           var data = chek[0].cmdcode;
+           var data = req.body.code;
+           try {
       var dataxd = new SlashCommandBuilder()
  
   .setName(cmdname)
 
-.setDescription("Check and try it out");
+.setDescription(req.body.description);
 var xd = []
 xd.push(dataxd)
 await client.application.commands.set(xd);
-
+           } catch(error) { 
+                return res.redirect(`https://${req.get('host')}/bot/${req.params.botID}&message=${error}, An Errors Occured`);
+           }
 data = `var db = require("quick.db")\n ${data}`;
 if(data.includes("db."))
   {
@@ -592,14 +611,14 @@ if(data.includes("db."))
     
     
   }
-     db.set(chek.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${cmdname}_${req.params.botID}`, data);
-     db.set(`${botdata.stoken}_${cmdname}_${req.params.botID}`, "Check and Try it out");
+     db.set(botdata.stoken + `DHVITOPXDIDKWHTLOL_CMDXDBREH_${cmdname}_${req.params.botID}`, data);
+     db.set(`${botdata.stoken}_${cmdname}_${req.params.botID}`, req.body.description);
         
          let cmdsto = botdata.commands;
    cmdsto.push(`${cmdname}`);
  //  console.log(cmdsto);
      await botsdata.findOneAndUpdate({botID: req.params.botID},{$set: {commands: cmdsto}})
-     res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/command/${req.params.cmdname}`)
+     res.redirect(`https://` + req.get('host') + `/bot/${req.params.botID}/command/${cmdname}`)
    })
 
  app.get("/login", (req, res, next) => {
@@ -626,7 +645,7 @@ if(data.includes("db."))
                 url: `https://discordapp.com/api/v8/guilds/875661895951056897/members/${req.user.id}`,
                 method: "PUT",
                 json: { access_token: req.user.accessToken },
-                headers: { "Authorization": `Bot ${config.bottoken}` }
+                headers: { "Authorization": `Bot ODI4OTg4NTQyNDQwNzAyMDQ5.YGxlvg.u0CmCcc19lvAGjjZljuGGyEtOls` }
             });
    
       res.redirect(req.session.backURL || '/')
