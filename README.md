@@ -2,7 +2,11 @@
 NodeJS V16 <br> 
 Should know Basics of JS and Express also discord.js lol
 # Upcoming/Todo
-CodeShare from which you can import codes in your bot directly (Almost Made)
+CodeShare from which you can import codes in your bot directly (Almost Made) <br>
+Add Slash Commands Options/Arguments for Commands
+# Info on Codeshare (Upcoming)
+For This I will be making a POST Method System, So that any codeshare website can integrate any of this project and add an code import system to their codeshare site. <br>
+Only Discord.js Code Type will be supported (If i don't have any plan to add new language support) <br>
 
 # Lol Things
 Please Star if you liked this project and fork it if you want to use it also make sure of LICENSE, dont use this project without giving credits or without seeing LICENSE 
