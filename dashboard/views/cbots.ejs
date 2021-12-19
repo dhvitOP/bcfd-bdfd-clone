@@ -33,7 +33,28 @@ transition: 0.5s;
       <script>
         function select(botid){ 
          if(!botid)return;
-         location.href = `<%- url %>/${botid}`;
+           const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = `https://<%- req.get('host') %>/import/${botid}`;
+     const params = {
+     code: '<%-`${req.body.code}`%>',
+     description: '<%-`${req.body.description}`%>',
+     name: '<%-`${req.body.name}`%>'
+     } 
+  for (const key in  params ) {
+    if (params.hasOwnProperty(key)) {
+      var hiddenField = document.createElement(`input`);
+      hiddenField.type = 'hidden';
+      hiddenField.name = key;
+      hiddenField.value =  params[key];
+
+      form.appendChild(hiddenField);
+    }
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+         
         }
       </script>
      <% botsdata.forEach((botxd) => {
