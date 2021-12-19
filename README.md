@@ -2,7 +2,7 @@
 NodeJS V16 <br> 
 Should know Basics of JS and Express also discord.js lol
 # Upcoming/Todo
-~~CodeShare from which you can import codes in your bot directly (Almost Made) ~~<br>
+~~CodeShare from which you can import codes in your bot directly (Almost Made)~~<br>
 Add Slash Commands Options/Arguments for Commands
 # Info on Codeshare Integration (Done)
 For This Its making a POST Method System, So that any codeshare website can integrate any of this project and add an code import system to their codeshare site. <br>
